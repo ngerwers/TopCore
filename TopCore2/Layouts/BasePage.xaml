@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="TopCore2.Layouts.BasePage"
+    BackgroundColor="Black">
+
+    <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,*">
+
+        <!-- Header -->
+        <Grid Grid.ColumnSpan="2" Padding="20,20,20,10">
+            <Grid ColumnDefinitions="Auto,*">
+                <Image Source="dotnet_bot.png"
+                       HeightRequest="45"
+                       Margin="0,0,20,0" />
+                <Label x:Name="TitleLabel"
+                       TextColor="White"
+                       FontSize="32"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center" />
+            </Grid>
+        </Grid>
+
+        <!-- Navigation Sidebar -->
+        <VerticalStackLayout Grid.Row="1"
+                             Grid.Column="0"
+                             Padding="20"
+                             Spacing="20">
+            <Label Text="Listen" TextColor="White" FontSize="20" />
+            <Label Text="Wie?" TextColor="White" FontSize="20" />
+            <Label Text="Neue Liste" TextColor="White" FontSize="20" />
+            <Label Text="Über Uns" TextColor="White" FontSize="20" />
+        </VerticalStackLayout>
+
+        <!-- Content Area -->
+        <ContentView
+            x:Name="ContentHost"
+            Grid.Row="1"
+            Grid.Column="1"
+            Padding="20" />
+
+    </Grid>
+</ContentPage>
