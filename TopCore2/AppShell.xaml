@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8" ?>
 <Shell
     x:Class="TopCore2.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -6,9 +5,21 @@
     xmlns:local="clr-namespace:TopCore2"
     Title="TopCore2">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <TabBar>
+        <ShellContent
+            Title="Home"
+            ContentTemplate="{DataTemplate local:MainPage}"
+            Route="MainPage" />
+
+        <ShellContent
+            Title="Listen"
+            ContentTemplate="{DataTemplate local:ListenPage}"
+            Route="ListenPage" />
+
+        <ShellContent
+            Title="Über Uns"
+            ContentTemplate="{DataTemplate local:UeberUnsPage}"
+            Route="UeberUnsPage" />
+    </TabBar>
 
 </Shell>

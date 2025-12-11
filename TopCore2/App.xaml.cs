@@ -1,17 +1,16 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿namespace TopCore2;
 
-namespace TopCore2
+public partial class App : Application
 {
-    public partial class App : Application
+    public App()
     {
-        public App()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
 
-        protected override Window CreateWindow(IActivationState? activationState)
+        // Verwende NavigationPage für Navigation
+        MainPage = new NavigationPage(new MainPage())
         {
-            return new Window(new AppShell());
-        }
+            BarBackgroundColor = Colors.Black,
+            BarTextColor = Colors.White
+        };
     }
 }

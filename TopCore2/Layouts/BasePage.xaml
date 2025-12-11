@@ -1,43 +1,69 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    x:Class="TopCore2.Layouts.BasePage"
-    BackgroundColor="Black">
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TopCore2.Layouts.BasePage"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{StaticResource PageBackground}">
 
-    <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,*">
+    <Grid ColumnDefinitions="250, *">
 
-        <!-- Header -->
-        <Grid Grid.ColumnSpan="2" Padding="20,20,20,10">
-            <Grid ColumnDefinitions="Auto,*">
-                <Image Source="dotnet_bot.png"
-                       HeightRequest="45"
-                       Margin="0,0,20,0" />
-                <Label x:Name="TitleLabel"
-                       TextColor="White"
-                       FontSize="32"
-                       FontAttributes="Bold"
-                       VerticalOptions="Center" />
-            </Grid>
+        <Grid Grid.Column="0" 
+              BackgroundColor="{StaticResource SidebarBackground}"
+              Padding="30,40,20,20"
+              RowDefinitions="Auto, *">
+
+            <VerticalStackLayout Grid.Row="0" Spacing="10" Margin="0,0,0,40">
+                <Image Source="logo-dark.png" 
+                       HorizontalOptions="Start"
+                       HeightRequest="60" 
+                       WidthRequest="80"
+                       Aspect="AspectFit"/>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Row="1" Spacing="15">
+
+                <Label Text="Listen" Style="{StaticResource NavLabelStyle}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnListenTapped"/>
+                    </Label.GestureRecognizers>
+                </Label>
+
+                <Label Text="Wie?" Style="{StaticResource NavLabelStyle}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnWieTapped"/>
+                    </Label.GestureRecognizers>
+                </Label>
+
+                <Label Text="Neue Liste" Style="{StaticResource NavLabelStyle}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnNeueListeTapped"/>
+                    </Label.GestureRecognizers>
+                </Label>
+
+                <Label Text="Über Uns" Style="{StaticResource NavLabelStyle}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnUeberUnsTapped"/>
+                    </Label.GestureRecognizers>
+                </Label>
+
+            </VerticalStackLayout>
         </Grid>
 
-        <!-- Navigation Sidebar -->
-        <VerticalStackLayout Grid.Row="1"
-                             Grid.Column="0"
-                             Padding="20"
-                             Spacing="20">
-            <Label Text="Listen" TextColor="White" FontSize="20" />
-            <Label Text="Wie?" TextColor="White" FontSize="20" />
-            <Label Text="Neue Liste" TextColor="White" FontSize="20" />
-            <Label Text="Über Uns" TextColor="White" FontSize="20" />
-        </VerticalStackLayout>
+        <Grid Grid.Column="1" 
+              Padding="40,40,40,0" 
+              RowDefinitions="Auto, *">
 
-        <!-- Content Area -->
-        <ContentView
-            x:Name="ContentHost"
-            Grid.Row="1"
-            Grid.Column="1"
-            Padding="20" />
+            <Label x:Name="TitleLabel"
+                   Grid.Row="0"
+                   Text="Titel Platzhalter"
+                   FontSize="42"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource TextPrimary}"
+                   Margin="0,0,0,30"/>
+
+            <ContentView x:Name="ContentHost"
+                         Grid.Row="1" />
+        </Grid>
 
     </Grid>
 </ContentPage>
