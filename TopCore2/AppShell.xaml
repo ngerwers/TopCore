@@ -5,7 +5,7 @@
     xmlns:local="clr-namespace:TopCore2"
     Title="TopCore2">
 
-    <TabBar>
+    <TabBar Shell.NavBarIsVisible="False">
         <ShellContent
             Title="Home"
             ContentTemplate="{DataTemplate local:MainPage}"

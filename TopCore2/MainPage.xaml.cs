@@ -1,79 +1,77 @@
-﻿using TopCore2.Layouts;
+﻿using System.Collections.ObjectModel;
+using TopCore2.Layouts;
 
 namespace TopCore2;
 
 public partial class MainPage : BasePage
 {
-    int count = 0;
+    private readonly ObservableCollection<string> _listItems = new();
+    private Entry? _newListItemEntry;
 
     public MainPage()
     {
         InitializeComponent();
 
-        // Setze den Titel
         SetTitle("Hauptseite");
 
-        // Erstelle den Inhalt
         BuildContent();
     }
 
     private void BuildContent()
     {
-        var layout = new VerticalStackLayout
+        var mainLayout = new VerticalStackLayout { Spacing = 15 };
+
+        var inputLayout = new Grid
         {
-            Padding = new Thickness(30, 0),
-            Spacing = 25
+            ColumnDefinitions =
+            {
+                new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = GridLength.Auto }
+            },
+            ColumnSpacing = 10
         };
 
-        // Image
-        layout.Children.Add(new Image
+        _newListItemEntry = new Entry
         {
-            Source = "dotnet_bot.png",
-            HeightRequest = 185,
-            Aspect = Aspect.AspectFit
-        });
-
-        // Hello Label
-        layout.Children.Add(new Label
-        {
-            Text = "Hello, World!",
+            Placeholder = "Neue Liste eingeben",
             TextColor = Colors.White,
-            FontSize = 32,
-            FontAttributes = FontAttributes.Bold
-        });
-
-        // Welcome Label
-        layout.Children.Add(new Label
-        {
-            Text = "Willkommen zu deiner App mit BasePage Layout!",
-            TextColor = Colors.LightGray,
-            FontSize = 18
-        });
-
-        // Button
-        var button = new Button
-        {
-            Text = "Click me",
-            HorizontalOptions = LayoutOptions.Fill
+            PlaceholderColor = Colors.LightGray
         };
-        button.Clicked += OnCounterClicked;
-        layout.Children.Add(button);
+        inputLayout.Children.Add(_newListItemEntry);
+        Grid.SetColumn(_newListItemEntry, 0);
 
-        // Setze den Content
-        SetContent(new ScrollView { Content = layout });
+        var addButton = new Button
+        {
+            Text = "Hinzufügen"
+        };
+        addButton.Clicked += OnAddItemClicked;
+        inputLayout.Children.Add(addButton);
+        Grid.SetColumn(addButton, 1);
+
+        mainLayout.Children.Add(inputLayout);
+
+        var listCollectionView = new CollectionView
+        {
+            ItemsSource = _listItems,
+            ItemTemplate = new DataTemplate(() =>
+            {
+                var label = new Label { TextColor = Colors.White, FontSize = 18 };
+                label.SetBinding(Label.TextProperty, ".");
+                var border = new Border { Content = label, BackgroundColor = Color.FromArgb("#1C1C1E"), Padding = new Thickness(10) };
+                return border;
+            })
+        };
+        mainLayout.Children.Add(listCollectionView);
+
+        SetContent(mainLayout);
     }
 
-    private void OnCounterClicked(object? sender, EventArgs e)
+    private void OnAddItemClicked(object? sender, EventArgs e)
     {
-        count++;
-        if (sender is not Button button)
+        if (_newListItemEntry != null && !string.IsNullOrWhiteSpace(_newListItemEntry.Text))
         {
-            return;
+            _listItems.Add(_newListItemEntry.Text);
+            _newListItemEntry.Text = string.Empty;
         }
-
-        if (count == 1)
-            button.Text = $"Clicked {count} time";
-        else
-            button.Text = $"Clicked {count} times";
     }
 }
