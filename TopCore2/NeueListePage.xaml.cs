@@ -5,11 +5,36 @@ using TopCore2.Models;
 
 namespace TopCore2;
 
+[QueryProperty(nameof(ListToEdit), "ListToEdit")]
 public partial class NeueListePage : BasePage
 {
-    private ObservableCollection<ListItem> _listItems = new();
+    private readonly ObservableCollection<ListItem> _listItems = new();
     private Entry? _titleEntry;
     private Slider? _prioritySlider;
+    private Liste? _editingList;
+
+    public Liste? ListToEdit
+    {
+        set
+        {
+            if (value == null) return;
+            
+            _editingList = value;
+            
+            if (_titleEntry != null) 
+                _titleEntry.Text = value.Title;
+            
+            if (_prioritySlider != null) 
+                _prioritySlider.Value = value.Importance;
+            
+            _listItems.Clear();
+            foreach (var item in value.Items)
+            {
+                _listItems.Add(item);
+            }
+            SetTitle("Liste Bearbeiten");
+        }
+    }
 
     public NeueListePage()
     {
@@ -60,8 +85,10 @@ public partial class NeueListePage : BasePage
                 var deleteButton = new Button { Text = "X", TextColor = Colors.Red };
                 deleteButton.Clicked += (s, e) =>
                 {
-                    var item = (ListItem)deleteButton.BindingContext;
-                    _listItems.Remove(item);
+                    if (s is Button { BindingContext: ListItem item })
+                    {
+                        _listItems.Remove(item);
+                    }
                 };
                 grid.Children.Add(deleteButton);
                 Grid.SetColumn(deleteButton, 1);
@@ -101,8 +128,6 @@ public partial class NeueListePage : BasePage
         SetContent(scrollView);
     }
     
-
-
     private void OnAddItemClicked(object? sender, EventArgs e)
     {
         _listItems.Add(new ListItem { Text = "" });
@@ -116,14 +141,25 @@ public partial class NeueListePage : BasePage
             return;
         }
 
-        var newList = new Liste
+        Liste listToSave;
+        if (_editingList != null)
         {
-            Title = _titleEntry.Text,
-            Importance = (int)_prioritySlider.Value,
-            Items = new List<ListItem>(_listItems)
-        };
+            _editingList.Title = _titleEntry.Text;
+            _editingList.Importance = (int)_prioritySlider.Value;
+            _editingList.Items = new List<ListItem>(_listItems);
+            listToSave = _editingList;
+        }
+        else
+        {
+            listToSave = new Liste
+            {
+                Title = _titleEntry.Text,
+                Importance = (int)_prioritySlider.Value,
+                Items = new List<ListItem>(_listItems)
+            };
+        }
 
-        await Services.ListService.SaveList(newList);
+        await Services.ListService.SaveList(listToSave);
         await Shell.Current.GoToAsync("..");
     }
 }

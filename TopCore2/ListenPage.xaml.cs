@@ -39,8 +39,7 @@ public partial class ListenPage : BasePage
                 lists = lists.OrderBy(l => l.Title).ToList();
                 break;
             case "Datum (Neu -> Alt)":
-                // Assuming the lists are added in chronological order
-                lists.Reverse();
+                lists = lists.OrderByDescending(l => l.DateCreated).ToList();
                 break;
         }
 
@@ -70,7 +69,10 @@ public partial class ListenPage : BasePage
         sortPicker.ItemsSource = new[] { "Wichtigkeit (Hoch -> Tief)", "Wichtigkeit (Tief -> Hoch)", "Name (A-Z)", "Datum (Neu -> Alt)" };
         sortPicker.SelectedIndexChanged += async (s, e) =>
         {
-            await LoadLists(sortPicker.SelectedItem.ToString());
+            if (sortPicker.SelectedItem != null)
+            {
+                await LoadLists(sortPicker.SelectedItem.ToString());
+            }
         };
         controlsLayout.Children.Add(sortPicker);
         Grid.SetColumn(sortPicker, 0);
@@ -113,27 +115,52 @@ public partial class ListenPage : BasePage
                 itemCountLabel.SetBinding(Label.TextProperty, "ItemCount", stringFormat: "{0} Items");
                 cardGrid.Children.Add(itemCountLabel);
                 Grid.SetRow(itemCountLabel, 1);
+                
+                var buttonStack = new VerticalStackLayout();
+
+                var editButton = new Button { Text = "Bearbeiten" };
+                editButton.Clicked += async (s, e) =>
+                {
+                    if (s is Button button && button.BindingContext is Liste item)
+                    {
+                        await Shell.Current.GoToAsync(nameof(NeueListePage), new Dictionary<string, object>
+                        {
+                            { "ListToEdit", item }
+                        });
+                    }
+                };
+                buttonStack.Children.Add(editButton);
 
                 var deleteButton = new Button { Text = "X", TextColor = Colors.Red };
                 deleteButton.Clicked += async (s, e) =>
                 {
-                    var item = (Liste)deleteButton.BindingContext;
-                    await Services.ListService.DeleteList(item);
-                    await LoadLists();
+                    if (s is Button button && button.BindingContext is Liste item)
+                    {
+                        bool answer = await Shell.Current.DisplayAlert("Löschen?", "Möchtest du diese Liste wirklich löschen?", "Ja", "Nein");
+                        if (answer)
+                        {
+                            await Services.ListService.DeleteList(item);
+                            await LoadLists();
+                        }
+                    }
                 };
-                cardGrid.Children.Add(deleteButton);
-                Grid.SetColumn(deleteButton, 1);
-                Grid.SetRowSpan(deleteButton, 2);
+                buttonStack.Children.Add(deleteButton);
+                
+                cardGrid.Children.Add(buttonStack);
+                Grid.SetColumn(buttonStack, 1);
+                Grid.SetRowSpan(buttonStack, 2);
 
                 var border = new Border { Content = cardGrid, BackgroundColor = Color.FromArgb("#1A1A1A"), StrokeThickness = 1, Stroke = Color.FromArgb("#0055FF"), StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(10) } };
                 var tapGestureRecognizer = new TapGestureRecognizer();
                 tapGestureRecognizer.Tapped += async (s, e) =>
                 {
-                    var item = (Liste)border.BindingContext;
-                    await Shell.Current.GoToAsync($"{nameof(ListDetailPage)}", new Dictionary<string, object>
+                    if (s is Border b && b.BindingContext is Liste item)
                     {
-                        { "List", item }
-                    });
+                        await Shell.Current.GoToAsync($"{nameof(ListDetailPage)}", new Dictionary<string, object>
+                        {
+                            { "List", item }
+                        });
+                    }
                 };
                 border.GestureRecognizers.Add(tapGestureRecognizer);
 

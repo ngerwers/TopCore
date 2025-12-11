@@ -22,10 +22,23 @@ namespace TopCore2.Services
             return JsonSerializer.Deserialize<List<Liste>>(json) ?? new List<Liste>();
         }
 
-        public static async Task SaveList(Liste newList)
+        public static async Task SaveList(Liste listToSave)
         {
             var lists = await GetAllLists();
-            lists.Add(newList);
+            var existingList = lists.Find(l => l.Id == listToSave.Id);
+
+            if (existingList != null)
+            {
+                // Update existing list
+                var index = lists.IndexOf(existingList);
+                lists[index] = listToSave;
+            }
+            else
+            {
+                // Add new list
+                lists.Add(listToSave);
+            }
+
             var json = JsonSerializer.Serialize(lists);
             await File.WriteAllTextAsync(_filePath, json);
         }
@@ -33,7 +46,7 @@ namespace TopCore2.Services
         public static async Task DeleteList(Liste listToRemove)
         {
             var lists = await GetAllLists();
-            var list = lists.Find(l => l.Title == listToRemove.Title);
+            var list = lists.Find(l => l.Id == listToRemove.Id);
             if (list != null)
             {
                 lists.Remove(list);
