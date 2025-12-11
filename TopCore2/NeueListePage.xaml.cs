@@ -8,7 +8,7 @@ namespace TopCore2;
 public partial class NeueListePage : BasePage
 {
     private ObservableCollection<ListItem> _listItems = new();
-
+    private Entry? _titleEntry;
 
     public NeueListePage()
     {
@@ -22,10 +22,10 @@ public partial class NeueListePage : BasePage
         var mainLayout = new VerticalStackLayout { Spacing = 20 };
 
         mainLayout.Children.Add(new Label { Text = "Titel", TextColor = Colors.White, FontSize = 18 });
-        var titleEntry = new Entry { Placeholder = "Titel der Liste" };
+        _titleEntry = new Entry { Placeholder = "Titel der Liste" };
         var titleEntryBorder = new Border
         {
-            Content = titleEntry,
+            Content = _titleEntry,
             Stroke = Color.FromArgb("#0055FF"),
             StrokeThickness = 1,
             StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(20) }
@@ -104,7 +104,19 @@ public partial class NeueListePage : BasePage
     
     private async void OnSaveListClicked(object? sender, EventArgs e)
     {
-        // TODO: Implement save logic
+        if (_titleEntry == null || string.IsNullOrWhiteSpace(_titleEntry.Text))
+        {
+            await DisplayAlertAsync("Fehler", "Bitte gib einen Titel für die Liste ein.", "OK");
+            return;
+        }
+
+        var newList = new Liste
+        {
+            Title = _titleEntry.Text,
+            Items = new List<ListItem>(_listItems)
+        };
+
+        await Services.ListService.SaveList(newList);
         await Shell.Current.GoToAsync("..");
     }
 }

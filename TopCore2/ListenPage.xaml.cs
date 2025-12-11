@@ -17,6 +17,23 @@ public partial class ListenPage : BasePage
         _listItems.Add(new AddListItem());
     }
 
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await LoadLists();
+    }
+
+    private async Task LoadLists()
+    {
+        var lists = await Services.ListService.GetAllLists();
+        _listItems.Clear();
+        _listItems.Add(new AddListItem());
+        foreach (var list in lists)
+        {
+            _listItems.Add(list);
+        }
+    }
+
     private void BuildContent()
     {
         var mainLayout = new VerticalStackLayout { Spacing = 20 };
@@ -56,6 +73,7 @@ public partial class ListenPage : BasePage
             {
                 var cardGrid = new Grid
                 {
+                    ColumnDefinitions = { new ColumnDefinition { Width = GridLength.Star }, new ColumnDefinition { Width = GridLength.Auto } },
                     RowDefinitions =
                     {
                         new RowDefinition { Height = GridLength.Auto },
@@ -74,9 +92,16 @@ public partial class ListenPage : BasePage
                 cardGrid.Children.Add(itemCountLabel);
                 Grid.SetRow(itemCountLabel, 1);
 
-                var editIcon = new Image { Source = "edit_icon.png", HeightRequest = 20, WidthRequest = 20, HorizontalOptions = LayoutOptions.End };
-                cardGrid.Children.Add(editIcon);
-                Grid.SetRowSpan(editIcon, 2);
+                var deleteButton = new Button { Text = "X", TextColor = Colors.Red };
+                deleteButton.Clicked += async (s, e) =>
+                {
+                    var item = (Liste)deleteButton.BindingContext;
+                    await Services.ListService.DeleteList(item);
+                    await LoadLists();
+                };
+                cardGrid.Children.Add(deleteButton);
+                Grid.SetColumn(deleteButton, 1);
+                Grid.SetRowSpan(deleteButton, 2);
 
                 return new Border { Content = cardGrid, BackgroundColor = Color.FromArgb("#1A1A1A"), StrokeThickness = 1, Stroke = Color.FromArgb("#0055FF"), StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(10) } };
             }),
