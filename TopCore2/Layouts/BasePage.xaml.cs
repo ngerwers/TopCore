@@ -15,7 +15,7 @@ public partial class BasePage : ContentPage
         ContentHost.Content = view;
     }
 
-    // Methode um den großen Titel oben rechts zu setzen
+    // Methode um den groï¿½en Titel oben rechts zu setzen
     public void SetTitle(string title)
     {
         TitleLabel.Text = title;
@@ -25,26 +25,21 @@ public partial class BasePage : ContentPage
 
     private async void OnListenTapped(object sender, EventArgs e)
     {
-        // Verhindert Flackern, wenn man schon auf der Seite ist
-        if (this.GetType() != typeof(ListenPage))
-            await Navigation.PushAsync(new ListenPage());
+        await Shell.Current.GoToAsync("..");
     }
 
     private async void OnWieTapped(object sender, EventArgs e)
     {
-        if (this.GetType() != typeof(WiePage))
-            await Navigation.PushAsync(new WiePage());
+        await Shell.Current.GoToAsync(nameof(WiePage));
     }
 
     private async void OnNeueListeTapped(object sender, EventArgs e)
     {
-        if (this.GetType() != typeof(NeueListePage))
-            await Navigation.PushAsync(new NeueListePage());
+        await Shell.Current.GoToAsync(nameof(NeueListePage));
     }
 
     private async void OnUeberUnsTapped(object sender, EventArgs e)
     {
-        if (this.GetType() != typeof(UeberUnsPage))
-            await Navigation.PushAsync(new UeberUnsPage());
+        await Shell.Current.GoToAsync(nameof(UeberUnsPage));
     }
 }

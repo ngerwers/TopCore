@@ -6,15 +6,12 @@
     <Application.Resources>
         <ResourceDictionary>
             <Color x:Key="PageBackground">#000000</Color>
-
             <Color x:Key="SidebarBackground">#000000</Color>
-
-            <Color x:Key="PrimaryAccent">#007AFF</Color>
-
+            <Color x:Key="PrimaryAccent">#0055FF</Color>
+            <Color x:Key="NeonBlue">#0055FF</Color>
             <Color x:Key="TextPrimary">#FFFFFF</Color>
-            <Color x:Key="TextSecondary">#A1A1A1</Color>
-
-            <Color x:Key="CardBackground">#1C1C1E</Color>
+            <Color x:Key="TextSecondary">#CCCCCC</Color>
+            <Color x:Key="CardBackground">#1A1A1A</Color>
 
             <Style x:Key="NavLabelStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
