@@ -13,7 +13,7 @@
               RowDefinitions="Auto, *">
 
             <VerticalStackLayout Grid.Row="0" Spacing="10" Margin="0,0,0,40">
-                <Image Source="logo-dark.png" 
+                <Image Source="logo_dark.png" 
                        HorizontalOptions="Start"
                        HeightRequest="60" 
                        WidthRequest="80"

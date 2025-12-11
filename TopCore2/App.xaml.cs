@@ -5,12 +5,14 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+    }
 
-        // Verwende NavigationPage für Navigation
-        MainPage = new NavigationPage(new MainPage())
-        {
-            BarBackgroundColor = Colors.Black,
-            BarTextColor = Colors.White
-        };
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        Window window = base.CreateWindow(activationState);
+
+        window.Page = new AppShell();
+
+        return window;
     }
 }

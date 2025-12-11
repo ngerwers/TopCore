@@ -66,7 +66,10 @@ public partial class MainPage : BasePage
     private void OnCounterClicked(object? sender, EventArgs e)
     {
         count++;
-        var button = (Button)sender;
+        if (sender is not Button button)
+        {
+            return;
+        }
 
         if (count == 1)
             button.Text = $"Clicked {count} time";
