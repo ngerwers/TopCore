@@ -103,7 +103,19 @@ public partial class ListenPage : BasePage
                 Grid.SetColumn(deleteButton, 1);
                 Grid.SetRowSpan(deleteButton, 2);
 
-                return new Border { Content = cardGrid, BackgroundColor = Color.FromArgb("#1A1A1A"), StrokeThickness = 1, Stroke = Color.FromArgb("#0055FF"), StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(10) } };
+                var border = new Border { Content = cardGrid, BackgroundColor = Color.FromArgb("#1A1A1A"), StrokeThickness = 1, Stroke = Color.FromArgb("#0055FF"), StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(10) } };
+                var tapGestureRecognizer = new TapGestureRecognizer();
+                tapGestureRecognizer.Tapped += async (s, e) =>
+                {
+                    var item = (Liste)border.BindingContext;
+                    await Shell.Current.GoToAsync($"{nameof(ListDetailPage)}", new Dictionary<string, object>
+                    {
+                        { "List", item }
+                    });
+                };
+                border.GestureRecognizers.Add(tapGestureRecognizer);
+
+                return border;
             }),
             AddTemplate = new DataTemplate(() =>
             {
@@ -115,7 +127,12 @@ public partial class ListenPage : BasePage
 
         mainLayout.Children.Add(listCollectionView);
 
-        SetContent(mainLayout);
+        var scrollView = new ScrollView
+        {
+            Content = mainLayout
+        };
+
+        SetContent(scrollView);
     }
     
 

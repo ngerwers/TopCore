@@ -92,7 +92,12 @@ public partial class NeueListePage : BasePage
         
         mainLayout.Children.Add(buttonsLayout);
 
-        SetContent(mainLayout);
+        var scrollView = new ScrollView
+        {
+            Content = mainLayout
+        };
+
+        SetContent(scrollView);
     }
     
 

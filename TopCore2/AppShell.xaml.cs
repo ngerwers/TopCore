@@ -10,6 +10,7 @@
             Routing.RegisterRoute(nameof(NeueListePage), typeof(NeueListePage));
             Routing.RegisterRoute(nameof(UeberUnsPage), typeof(UeberUnsPage));
             Routing.RegisterRoute(nameof(WiePage), typeof(WiePage));
+            Routing.RegisterRoute(nameof(ListDetailPage), typeof(ListDetailPage));
         }
     }
 }
