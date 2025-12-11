@@ -19,7 +19,7 @@ public partial class NeueListePage : BasePage
 
     private void BuildContent()
     {
-        var mainLayout = new VerticalStackLayout { Spacing = 20, Padding = 30 };
+        var mainLayout = new VerticalStackLayout { Spacing = 20 };
 
         mainLayout.Children.Add(new Label { Text = "Titel", TextColor = Colors.White, FontSize = 18 });
         var titleEntry = new Entry { Placeholder = "Titel der Liste" };

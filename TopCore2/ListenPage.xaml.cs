@@ -14,12 +14,12 @@ public partial class ListenPage : BasePage
         InitializeComponent();
         SetTitle("Meine Listen");
         BuildContent();
-        LoadData();
+        _listItems.Add(new AddListItem());
     }
 
     private void BuildContent()
     {
-        var mainLayout = new VerticalStackLayout { Spacing = 20, Padding = 30 };
+        var mainLayout = new VerticalStackLayout { Spacing = 20 };
 
         var controlsLayout = new Grid
         {
@@ -93,13 +93,7 @@ public partial class ListenPage : BasePage
         SetContent(mainLayout);
     }
     
-    private void LoadData()
-    {
-        _listItems.Add(new AddListItem());
-        _listItems.Add(new Liste { Title = "Einkaufsliste", ItemCount = 5 });
-        _listItems.Add(new Liste { Title = "Filme zum Anschauen", ItemCount = 12 });
-        _listItems.Add(new Liste { Title = "Reise nach Japan", ItemCount = 20 });
-    }
+
     
     private async void OnAddNewListClicked(object? sender, EventArgs e)
     {
