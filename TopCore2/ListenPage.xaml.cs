@@ -23,9 +23,27 @@ public partial class ListenPage : BasePage
         await LoadLists();
     }
 
-    private async Task LoadLists()
+    private async Task LoadLists(string sortBy = "Wichtigkeit (Hoch -> Tief)")
     {
         var lists = await Services.ListService.GetAllLists();
+
+        switch (sortBy)
+        {
+            case "Wichtigkeit (Hoch -> Tief)":
+                lists = lists.OrderByDescending(l => l.Importance).ToList();
+                break;
+            case "Wichtigkeit (Tief -> Hoch)":
+                lists = lists.OrderBy(l => l.Importance).ToList();
+                break;
+            case "Name (A-Z)":
+                lists = lists.OrderBy(l => l.Title).ToList();
+                break;
+            case "Datum (Neu -> Alt)":
+                // Assuming the lists are added in chronological order
+                lists.Reverse();
+                break;
+        }
+
         _listItems.Clear();
         _listItems.Add(new AddListItem());
         foreach (var list in lists)
@@ -49,7 +67,11 @@ public partial class ListenPage : BasePage
         };
 
         var sortPicker = new Picker { Title = "Sortieren" };
-        sortPicker.ItemsSource = new[] { "Datum", "Name", "Anzahl" };
+        sortPicker.ItemsSource = new[] { "Wichtigkeit (Hoch -> Tief)", "Wichtigkeit (Tief -> Hoch)", "Name (A-Z)", "Datum (Neu -> Alt)" };
+        sortPicker.SelectedIndexChanged += async (s, e) =>
+        {
+            await LoadLists(sortPicker.SelectedItem.ToString());
+        };
         controlsLayout.Children.Add(sortPicker);
         Grid.SetColumn(sortPicker, 0);
 

@@ -9,6 +9,7 @@ public partial class NeueListePage : BasePage
 {
     private ObservableCollection<ListItem> _listItems = new();
     private Entry? _titleEntry;
+    private Slider? _prioritySlider;
 
     public NeueListePage()
     {
@@ -33,8 +34,8 @@ public partial class NeueListePage : BasePage
         mainLayout.Children.Add(titleEntryBorder);
 
         mainLayout.Children.Add(new Label { Text = "Listen Wichtigkeit 1 - 10", TextColor = Colors.White, FontSize = 18 });
-        var prioritySlider = new Slider { Minimum = 1, Maximum = 10, Value = 5 };
-        mainLayout.Children.Add(prioritySlider);
+        _prioritySlider = new Slider { Minimum = 1, Maximum = 10, Value = 5 };
+        mainLayout.Children.Add(_prioritySlider);
 
         var listCollectionView = new CollectionView
         {
@@ -109,7 +110,7 @@ public partial class NeueListePage : BasePage
     
     private async void OnSaveListClicked(object? sender, EventArgs e)
     {
-        if (_titleEntry == null || string.IsNullOrWhiteSpace(_titleEntry.Text))
+        if (_titleEntry == null || string.IsNullOrWhiteSpace(_titleEntry.Text) || _prioritySlider == null)
         {
             await DisplayAlertAsync("Fehler", "Bitte gib einen Titel für die Liste ein.", "OK");
             return;
@@ -118,6 +119,7 @@ public partial class NeueListePage : BasePage
         var newList = new Liste
         {
             Title = _titleEntry.Text,
+            Importance = (int)_prioritySlider.Value,
             Items = new List<ListItem>(_listItems)
         };
 
