@@ -8,14 +8,13 @@ namespace TopCore2;
 public partial class NeueListePage : BasePage
 {
     private ObservableCollection<ListItem> _listItems = new();
-    private Entry? _newItemEntry;
+
 
     public NeueListePage()
     {
         InitializeComponent();
         SetTitle("Neue Liste");
         BuildContent();
-        LoadData();
     }
 
     private void BuildContent()
@@ -42,22 +41,34 @@ public partial class NeueListePage : BasePage
             ItemsSource = _listItems,
             ItemTemplate = new DataTemplate(() =>
             {
-                var label = new Label { TextColor = Colors.White, FontSize = 16 };
-                label.SetBinding(Label.TextProperty, "Text");
-                return new Border { Content = label, BackgroundColor = Color.FromArgb("#1A1A1A"), StrokeThickness = 1, Stroke = Color.FromArgb("#0055FF"), StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(10) }, Padding = new Thickness(10) };
+                var grid = new Grid
+                {
+                    ColumnDefinitions =
+                    {
+                        new ColumnDefinition { Width = GridLength.Star },
+                        new ColumnDefinition { Width = GridLength.Auto }
+                    },
+                    ColumnSpacing = 10
+                };
+
+                var itemEntry = new Entry { TextColor = Colors.White, BackgroundColor = Colors.Transparent };
+                itemEntry.SetBinding(Entry.TextProperty, "Text");
+                grid.Children.Add(itemEntry);
+                Grid.SetColumn(itemEntry, 0);
+
+                var deleteButton = new Button { Text = "X", TextColor = Colors.Red };
+                deleteButton.Clicked += (s, e) =>
+                {
+                    var item = (ListItem)deleteButton.BindingContext;
+                    _listItems.Remove(item);
+                };
+                grid.Children.Add(deleteButton);
+                Grid.SetColumn(deleteButton, 1);
+                
+                return new Border { Content = grid, BackgroundColor = Color.FromArgb("#1A1A1A"), StrokeThickness = 1, Stroke = Color.FromArgb("#0055FF"), StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(10) }, Padding = new Thickness(10) };
             })
         };
         mainLayout.Children.Add(listCollectionView);
-
-        _newItemEntry = new Entry { Placeholder = "Neues Item" };
-        var newItemEntryBorder = new Border
-        {
-            Content = _newItemEntry,
-            Stroke = Color.FromArgb("#0055FF"),
-            StrokeThickness = 1,
-            StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(20) }
-        };
-        mainLayout.Children.Add(newItemEntryBorder);
         
         var buttonsLayout = new Grid
         {
@@ -84,19 +95,11 @@ public partial class NeueListePage : BasePage
         SetContent(mainLayout);
     }
     
-    private void LoadData()
-    {
-        _listItems.Add(new ListItem { Text = "Star Wars 2" });
-        _listItems.Add(new ListItem { Text = "Home Alone" });
-    }
+
 
     private void OnAddItemClicked(object? sender, EventArgs e)
     {
-        if (_newItemEntry != null && !string.IsNullOrWhiteSpace(_newItemEntry.Text))
-        {
-            _listItems.Add(new ListItem { Text = _newItemEntry.Text });
-            _newItemEntry.Text = string.Empty;
-        }
+        _listItems.Add(new ListItem { Text = "" });
     }
     
     private async void OnSaveListClicked(object? sender, EventArgs e)
