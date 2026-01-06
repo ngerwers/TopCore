@@ -7,8 +7,12 @@ namespace TopCore2;
 
 public partial class ListenPage : BasePage
 {
-    private ObservableCollection<object> _listItems = new();
-
+    private readonly ObservableCollection<object> _listItems = new();
+    private List<Liste> _allLists = new();
+    private List<Liste> _sortedLists = new();
+    private Entry? _searchEntry;
+    private Picker? _sortPicker;
+    
     public ListenPage()
     {
         InitializeComponent();
@@ -23,29 +27,54 @@ public partial class ListenPage : BasePage
         await LoadLists();
     }
 
-    private async Task LoadLists(string sortBy = "Wichtigkeit (Hoch -> Tief)")
+    private async Task LoadLists(string? sortBy = null)
     {
-        var lists = await Services.ListService.GetAllLists();
+        sortBy ??= _sortPicker?.SelectedItem as string ?? "Wichtigkeit (Hoch -> Tief)";
+
+        _allLists = await Services.ListService.GetAllLists();
 
         switch (sortBy)
         {
             case "Wichtigkeit (Hoch -> Tief)":
-                lists = lists.OrderByDescending(l => l.Importance).ToList();
+                _sortedLists = _allLists.OrderByDescending(l => l.Importance).ToList();
                 break;
             case "Wichtigkeit (Tief -> Hoch)":
-                lists = lists.OrderBy(l => l.Importance).ToList();
+                _sortedLists = _allLists.OrderBy(l => l.Importance).ToList();
                 break;
             case "Name (A-Z)":
-                lists = lists.OrderBy(l => l.Title).ToList();
+                _sortedLists = _allLists.OrderBy(l => l.Title).ToList();
                 break;
             case "Datum (Neu -> Alt)":
-                lists = lists.OrderByDescending(l => l.DateCreated).ToList();
+                _sortedLists = _allLists.OrderByDescending(l => l.DateCreated).ToList();
+                break;
+            default:
+                _sortedLists = _allLists.OrderByDescending(l => l.Importance).ToList();
                 break;
         }
 
+        if (_searchEntry != null)
+        {
+            _searchEntry.Text = string.Empty;
+        }
+
+        UpdateDisplayedLists();
+    }
+
+    private void OnSearchTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        UpdateDisplayedLists(e.NewTextValue);
+    }
+
+    private void UpdateDisplayedLists(string? searchText = null)
+    {
         _listItems.Clear();
         _listItems.Add(new AddListItem());
-        foreach (var list in lists)
+
+        var listsToDisplay = string.IsNullOrWhiteSpace(searchText)
+            ? _sortedLists
+            : _sortedLists.Where(l => l.Title != null && l.Title.StartsWith(searchText, StringComparison.OrdinalIgnoreCase));
+
+        foreach (var list in listsToDisplay)
         {
             _listItems.Add(list);
         }
@@ -65,28 +94,31 @@ public partial class ListenPage : BasePage
             ColumnSpacing = 20
         };
 
-        var sortPicker = new Picker { Title = "Sortieren" };
-        sortPicker.ItemsSource = new[] { "Wichtigkeit (Hoch -> Tief)", "Wichtigkeit (Tief -> Hoch)", "Name (A-Z)", "Datum (Neu -> Alt)" };
-        sortPicker.SelectedIndexChanged += async (s, e) =>
+        _sortPicker = new Picker { Title = "Sortieren" };
+        _sortPicker.ItemsSource = new[] { "Wichtigkeit (Hoch -> Tief)", "Wichtigkeit (Tief -> Hoch)", "Name (A-Z)", "Datum (Neu -> Alt)" };
+        _sortPicker.SelectedIndex = 0;
+        _sortPicker.SelectedIndexChanged += async (s, e) =>
         {
-            if (sortPicker.SelectedItem != null)
+            if (_sortPicker.SelectedItem != null)
             {
-                await LoadLists(sortPicker.SelectedItem.ToString());
+                await LoadLists(_sortPicker.SelectedItem.ToString());
             }
         };
-        controlsLayout.Children.Add(sortPicker);
-        Grid.SetColumn(sortPicker, 0);
+        controlsLayout.Children.Add(_sortPicker);
+        Grid.SetColumn(_sortPicker, 0);
 
-        var searchEntry = new Entry { Placeholder = "Listen Suchen" };
+        _searchEntry = new Entry { Placeholder = "Listen Suchen" };
+        _searchEntry.TextChanged += OnSearchTextChanged;
         var searchEntryBorder = new Border
         {
-            Content = searchEntry,
+            Content = _searchEntry,
             Stroke = Color.FromArgb("#0055FF"),
             StrokeThickness = 1,
             StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(20) }
         };
         controlsLayout.Children.Add(searchEntryBorder);
         Grid.SetColumn(searchEntryBorder, 1);
+
 
         mainLayout.Children.Add(controlsLayout);
 
@@ -100,6 +132,7 @@ public partial class ListenPage : BasePage
                     ColumnDefinitions = { new ColumnDefinition { Width = GridLength.Star }, new ColumnDefinition { Width = GridLength.Auto } },
                     RowDefinitions =
                     {
+                        new RowDefinition { Height = GridLength.Auto },
                         new RowDefinition { Height = GridLength.Auto },
                         new RowDefinition { Height = GridLength.Auto }
                     },
@@ -115,6 +148,11 @@ public partial class ListenPage : BasePage
                 itemCountLabel.SetBinding(Label.TextProperty, "ItemCount", stringFormat: "{0} Items");
                 cardGrid.Children.Add(itemCountLabel);
                 Grid.SetRow(itemCountLabel, 1);
+
+                var deadlineLabel = new Label { TextColor = Colors.White, FontSize = 12 };
+                deadlineLabel.SetBinding(Label.TextProperty, "Deadline", stringFormat: "Fällig am: {0:dd.MM.yyyy}");
+                cardGrid.Children.Add(deadlineLabel);
+                Grid.SetRow(deadlineLabel, 2);
                 
                 var buttonStack = new VerticalStackLayout();
 
@@ -148,7 +186,7 @@ public partial class ListenPage : BasePage
                 
                 cardGrid.Children.Add(buttonStack);
                 Grid.SetColumn(buttonStack, 1);
-                Grid.SetRowSpan(buttonStack, 2);
+                Grid.SetRowSpan(buttonStack, 3);
 
                 var border = new Border { Content = cardGrid, BackgroundColor = Color.FromArgb("#1A1A1A"), StrokeThickness = 1, Stroke = Color.FromArgb("#0055FF"), StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(10) } };
                 var tapGestureRecognizer = new TapGestureRecognizer();

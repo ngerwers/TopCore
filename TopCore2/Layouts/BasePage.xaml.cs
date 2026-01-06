@@ -25,7 +25,7 @@ public partial class BasePage : ContentPage
 
     private async void OnListenTapped(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("..");
+        await Shell.Current.GoToAsync("//ListenPage");
     }
 
     private async void OnWieTapped(object sender, EventArgs e)

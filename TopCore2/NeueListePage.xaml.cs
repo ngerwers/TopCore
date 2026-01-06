@@ -2,6 +2,7 @@ using Microsoft.Maui.Controls.Shapes;
 using System.Collections.ObjectModel;
 using TopCore2.Layouts;
 using TopCore2.Models;
+using TopCore2.Services;
 
 namespace TopCore2;
 
@@ -11,6 +12,9 @@ public partial class NeueListePage : BasePage
     private readonly ObservableCollection<ListItem> _listItems = new();
     private Entry? _titleEntry;
     private Slider? _prioritySlider;
+    private DatePicker? _deadlinePicker;
+    private Switch? _favoriteSwitch;
+    private Switch? _deadlineSwitch;
     private Liste? _editingList;
 
     public Liste? ListToEdit
@@ -18,15 +22,29 @@ public partial class NeueListePage : BasePage
         set
         {
             if (value == null) return;
-            
+
             _editingList = value;
-            
-            if (_titleEntry != null) 
+
+            if (_titleEntry != null)
                 _titleEntry.Text = value.Title;
-            
-            if (_prioritySlider != null) 
+
+            if (_prioritySlider != null)
                 _prioritySlider.Value = value.Importance;
-            
+
+            if (_deadlineSwitch != null)
+            {
+                _deadlineSwitch.IsToggled = value.Deadline.HasValue;
+            }
+
+            if (_deadlinePicker != null)
+            {
+                _deadlinePicker.Date = value.Deadline ?? DateTime.Now;
+                _deadlinePicker.IsVisible = value.Deadline.HasValue;
+            }
+
+            if (_favoriteSwitch != null)
+                _favoriteSwitch.IsToggled = value.IsFavorite;
+
             _listItems.Clear();
             foreach (var item in value.Items)
             {
@@ -45,7 +63,7 @@ public partial class NeueListePage : BasePage
 
     private void BuildContent()
     {
-        var mainLayout = new VerticalStackLayout { Spacing = 20 };
+        var mainLayout = new VerticalStackLayout { Spacing = 20, Padding = new Thickness(20) };
 
         mainLayout.Children.Add(new Label { Text = "Titel", TextColor = Colors.White, FontSize = 18 });
         _titleEntry = new Entry { Placeholder = "Titel der Liste" };
@@ -61,6 +79,23 @@ public partial class NeueListePage : BasePage
         mainLayout.Children.Add(new Label { Text = "Listen Wichtigkeit 1 - 10", TextColor = Colors.White, FontSize = 18 });
         _prioritySlider = new Slider { Minimum = 1, Maximum = 10, Value = 5 };
         mainLayout.Children.Add(_prioritySlider);
+
+        var deadlineLayout = new HorizontalStackLayout { Spacing = 10, VerticalOptions = LayoutOptions.Center };
+        deadlineLayout.Children.Add(new Label { Text = "Fälligkeitsdatum aktivieren", TextColor = Colors.White, FontSize = 18, VerticalOptions = LayoutOptions.Center });
+        _deadlineSwitch = new Switch { IsToggled = false };
+        deadlineLayout.Children.Add(_deadlineSwitch);
+        mainLayout.Children.Add(deadlineLayout);
+
+        _deadlinePicker = new DatePicker { Date = DateTime.Now, IsVisible = false };
+        _deadlinePicker.SetBinding(IsVisibleProperty, new Binding("IsToggled", source: _deadlineSwitch));
+        mainLayout.Children.Add(_deadlinePicker);
+
+        var favoriteLayout = new HorizontalStackLayout { Spacing = 10, VerticalOptions = LayoutOptions.Center };
+        favoriteLayout.Children.Add(new Label { Text = "Als Favorit markieren", TextColor = Colors.White, FontSize = 18, VerticalOptions = LayoutOptions.Center });
+        _favoriteSwitch = new Switch { IsToggled = false };
+        favoriteLayout.Children.Add(_favoriteSwitch);
+        mainLayout.Children.Add(favoriteLayout);
+
 
         var listCollectionView = new CollectionView
         {
@@ -92,12 +127,12 @@ public partial class NeueListePage : BasePage
                 };
                 grid.Children.Add(deleteButton);
                 Grid.SetColumn(deleteButton, 1);
-                
+
                 return new Border { Content = grid, BackgroundColor = Color.FromArgb("#1A1A1A"), StrokeThickness = 1, Stroke = Color.FromArgb("#0055FF"), StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(10) }, Padding = new Thickness(10) };
             })
         };
         mainLayout.Children.Add(listCollectionView);
-        
+
         var buttonsLayout = new Grid
         {
             ColumnDefinitions =
@@ -107,7 +142,7 @@ public partial class NeueListePage : BasePage
             },
             ColumnSpacing = 20
         };
-        
+
         var addItemButton = new Button { Text = "+ Neues Item" };
         addItemButton.Clicked += OnAddItemClicked;
         buttonsLayout.Children.Add(addItemButton);
@@ -117,7 +152,7 @@ public partial class NeueListePage : BasePage
         saveListButton.Clicked += OnSaveListClicked;
         buttonsLayout.Children.Add(saveListButton);
         Grid.SetColumn(saveListButton, 1);
-        
+
         mainLayout.Children.Add(buttonsLayout);
 
         var scrollView = new ScrollView
@@ -127,17 +162,23 @@ public partial class NeueListePage : BasePage
 
         SetContent(scrollView);
     }
-    
+
     private void OnAddItemClicked(object? sender, EventArgs e)
     {
         _listItems.Add(new ListItem { Text = "" });
     }
-    
+
     private async void OnSaveListClicked(object? sender, EventArgs e)
     {
-        if (_titleEntry == null || string.IsNullOrWhiteSpace(_titleEntry.Text) || _prioritySlider == null)
+        if (_titleEntry == null || string.IsNullOrWhiteSpace(_titleEntry.Text))
         {
-            await DisplayAlertAsync("Fehler", "Bitte gib einen Titel für die Liste ein.", "OK");
+            await DisplayAlert("Fehler", "Der Titel darf nicht leer sein.", "OK");
+            return;
+        }
+
+        if (_prioritySlider == null || _deadlinePicker == null || _favoriteSwitch == null || _deadlineSwitch == null)
+        {
+            // Should not happen
             return;
         }
 
@@ -147,6 +188,8 @@ public partial class NeueListePage : BasePage
             _editingList.Title = _titleEntry.Text;
             _editingList.Importance = (int)_prioritySlider.Value;
             _editingList.Items = new List<ListItem>(_listItems);
+            _editingList.Deadline = _deadlineSwitch.IsToggled ? _deadlinePicker.Date : (DateTime?)null;
+            _editingList.IsFavorite = _favoriteSwitch.IsToggled;
             listToSave = _editingList;
         }
         else
@@ -155,11 +198,13 @@ public partial class NeueListePage : BasePage
             {
                 Title = _titleEntry.Text,
                 Importance = (int)_prioritySlider.Value,
-                Items = new List<ListItem>(_listItems)
+                Items = new List<ListItem>(_listItems),
+                Deadline = _deadlineSwitch.IsToggled ? _deadlinePicker.Date : (DateTime?)null,
+                IsFavorite = _favoriteSwitch.IsToggled
             };
         }
 
-        await Services.ListService.SaveList(listToSave);
-        await Shell.Current.GoToAsync("..");
+        await ListService.SaveList(listToSave);
+        await Shell.Current.GoToAsync("//ListenPage");
     }
 }

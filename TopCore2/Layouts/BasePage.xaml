@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="TopCore2.Layouts.BasePage"
              NavigationPage.HasNavigationBar="False"
+             Shell.PresentationMode="NotAnimated"
              BackgroundColor="{StaticResource PageBackground}">
 
     <Grid ColumnDefinitions="250, *">

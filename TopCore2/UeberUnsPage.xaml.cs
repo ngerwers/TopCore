@@ -7,7 +7,7 @@ public partial class UeberUnsPage : BasePage
     public UeberUnsPage()
     {
         InitializeComponent();
-        SetTitle("Über Uns");
+        SetTitle("Ãœber Uns");
         BuildContent();
     }
 
@@ -16,14 +16,35 @@ public partial class UeberUnsPage : BasePage
         var content = new VerticalStackLayout
         {
             Spacing = 20,
-            Padding = 30
+            VerticalOptions = LayoutOptions.Center
         };
+
+        content.Children.Add(new Image
+        {
+            Source = "logo_dark.png",
+            HeightRequest = 150,
+            HorizontalOptions = LayoutOptions.Start
+        });
 
         content.Children.Add(new Label
         {
-            Text = "Informationen über uns",
+            Text = "App Version: 1.0",
             TextColor = Colors.White,
-            FontSize = 24
+            FontSize = 14
+        });
+
+        content.Children.Add(new Label
+        {
+            Text = "Entwickelt von: SN",
+            TextColor = Colors.White,
+            FontSize = 14
+        });
+
+        content.Children.Add(new Label
+        {
+            Text = "TopCore ist dein Tool fÃ¼r besseres Task-Management.",
+            TextColor = Colors.White,
+            FontSize = 16
         });
 
         SetContent(content);
