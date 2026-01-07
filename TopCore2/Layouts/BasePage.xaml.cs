@@ -9,13 +9,15 @@ public partial class BasePage : ContentPage
         InitializeComponent();
     }
 
-    // Methode um den Inhalt zu setzen (von den Kind-Seiten aufgerufen)
-    public void SetContent(View view)
+    /// <summary>
+    /// Ermöglicht das Setzen des Hauptinhalts der Seite von abgeleiteten Klassen.
+    /// </summary>
+    public View? MainContent
     {
-        ContentHost.Content = view;
+        get => ContentHost.Content;
+        set => ContentHost.Content = value;
     }
 
-    // Methode um den gro�en Titel oben rechts zu setzen
     public void SetTitle(string title)
     {
         TitleLabel.Text = title;

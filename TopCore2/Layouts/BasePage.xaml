@@ -6,65 +6,32 @@
              Shell.PresentationMode="NotAnimated"
              BackgroundColor="{StaticResource PageBackground}">
 
-    <Grid ColumnDefinitions="250, *">
+    <Grid RowDefinitions="*, Auto">
 
-        <Grid Grid.Column="0" 
-              BackgroundColor="{StaticResource SidebarBackground}"
-              Padding="30,40,20,20"
-              RowDefinitions="Auto, *">
-
-            <VerticalStackLayout Grid.Row="0" Spacing="10" Margin="0,0,0,40">
-                <Image Source="logo_dark.png" 
-                       HorizontalOptions="Start"
-                       HeightRequest="60" 
-                       WidthRequest="80"
-                       Aspect="AspectFit"/>
-            </VerticalStackLayout>
-
-            <VerticalStackLayout Grid.Row="1" Spacing="15">
-
-                <Label Text="Listen" Style="{StaticResource NavLabelStyle}">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnListenTapped"/>
-                    </Label.GestureRecognizers>
-                </Label>
-
-                <Label Text="Wie?" Style="{StaticResource NavLabelStyle}">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnWieTapped"/>
-                    </Label.GestureRecognizers>
-                </Label>
-
-                <Label Text="Neue Liste" Style="{StaticResource NavLabelStyle}">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnNeueListeTapped"/>
-                    </Label.GestureRecognizers>
-                </Label>
-
-                <Label Text="Über Uns" Style="{StaticResource NavLabelStyle}">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnUeberUnsTapped"/>
-                    </Label.GestureRecognizers>
-                </Label>
-
-            </VerticalStackLayout>
-        </Grid>
-
-        <Grid Grid.Column="1" 
-              Padding="40,40,40,0" 
-              RowDefinitions="Auto, *">
-
+        <Grid Grid.Row="0" RowDefinitions="Auto, *" Padding="20">
             <Label x:Name="TitleLabel"
                    Grid.Row="0"
-                   Text="Titel Platzhalter"
-                   FontSize="42"
+                   Text=""
+                   FontSize="32"
                    FontAttributes="Bold"
                    TextColor="{StaticResource TextPrimary}"
-                   Margin="0,0,0,30"/>
-
-            <ContentView x:Name="ContentHost"
-                         Grid.Row="1" />
+                   Margin="0,0,0,20"/>
+            
+            <!-- Hauptinhaltsbereich, in den der Inhalt der abgeleiteten Seiten eingefügt wird -->
+            <ContentView x:Name="ContentHost" Grid.Row="1" />
         </Grid>
+        
+        <!-- Untere Navigationsleiste -->
+        <Grid Grid.Row="1"
+              HeightRequest="60"
+              BackgroundColor="{StaticResource SidebarBackground}"
+              ColumnDefinitions="*, *, *, *">
 
+            <Button Grid.Column="0" Text="Listen" Clicked="OnListenTapped" Style="{StaticResource NavButtonStyle}" />
+            <Button Grid.Column="1" Text="Wie?" Clicked="OnWieTapped" Style="{StaticResource NavButtonStyle}" />
+            <Button Grid.Column="2" Text="Neue Liste" Clicked="OnNeueListeTapped" Style="{StaticResource NavButtonStyle}" />
+            <Button Grid.Column="3" Text="Über Uns" Clicked="OnUeberUnsTapped" Style="{StaticResource NavButtonStyle}" />
+
+        </Grid>
     </Grid>
 </ContentPage>
