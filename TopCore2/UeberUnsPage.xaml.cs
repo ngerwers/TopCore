@@ -16,7 +16,7 @@ public partial class UeberUnsPage : BasePage
         var content = new VerticalStackLayout
         {
             Spacing = 20,
-            VerticalOptions = LayoutOptions.Center
+            VerticalOptions = LayoutOptions.Start
         };
 
         content.Children.Add(new Image
@@ -35,7 +35,7 @@ public partial class UeberUnsPage : BasePage
 
         content.Children.Add(new Label
         {
-            Text = "Entwickelt von: SN",
+            Text = "Entwickelt von: Simon Gerwer",
             TextColor = Colors.White,
             FontSize = 14
         });
