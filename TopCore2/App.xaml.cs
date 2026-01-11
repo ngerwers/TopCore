@@ -9,7 +9,6 @@ public partial class App : Application
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        // Direkt ein neues Fenster mit der AppShell zurückgeben
         return new Window(new AppShell());
     }
 }

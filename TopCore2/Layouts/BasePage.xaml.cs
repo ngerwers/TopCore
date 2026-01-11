@@ -9,7 +9,6 @@ public partial class BasePage : ContentPage
         InitializeComponent();
     }
 
-    // Methode um den Inhalt zu setzen (von den Kind-Seiten aufgerufen)
     public void SetContent(View view)
     {
         ContentHost.Content = view;
@@ -20,8 +19,6 @@ public partial class BasePage : ContentPage
     {
         TitleLabel.Text = title;
     }
-
-    // --- Navigation Events ---
 
     private async void OnListenTapped(object sender, EventArgs e)
     {

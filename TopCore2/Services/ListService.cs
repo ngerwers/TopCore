@@ -29,13 +29,11 @@ namespace TopCore2.Services
 
             if (existingList != null)
             {
-                // Update existing list
                 var index = lists.IndexOf(existingList);
                 lists[index] = listToSave;
             }
             else
             {
-                // Add new list
                 lists.Add(listToSave);
             }
 

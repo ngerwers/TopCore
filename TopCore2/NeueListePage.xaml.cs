@@ -178,7 +178,6 @@ public partial class NeueListePage : BasePage
 
         if (_prioritySlider == null || _deadlinePicker == null || _favoriteSwitch == null || _deadlineSwitch == null)
         {
-            // Should not happen
             return;
         }
 
